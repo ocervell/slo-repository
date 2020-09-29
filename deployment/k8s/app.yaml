@@ -1,0 +1,48 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: slo-generator
+spec:
+  schedule: "* * * * */1"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: slo-generator
+            image: gcr.io/rnm-shared-devops/slo-generator
+            args:
+            - -f
+            - /etc/config/slos/
+            - -b
+            - /etc/config/error_budget_policy.yaml
+            - -e
+            - "true"
+            volumeMounts:
+              - name: error-budget-policy
+                mountPath: /etc/config/error_budget_policy.yaml
+                subPath: error_budget_policy.yaml
+              - name: slos
+                mountPath: /etc/config/slos
+          volumes:
+            - name: error-budget-policy
+              configMap:
+                name: config
+            - name: slos
+              configMap:
+                name: slos
