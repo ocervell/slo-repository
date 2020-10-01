@@ -14,9 +14,9 @@
 ---
 service_name:    gke
 feature_name:    flask
-slo_description: 99.99% of Flask app requests return in less than 250ms
+slo_description: 99% of Flask app requests return in less than 250ms
 slo_name:        latency-sli
-slo_target:      0.9999
+slo_target:      0.99
 backend:
   class:         Prometheus
   url:           ${PROMETHEUS_URL}

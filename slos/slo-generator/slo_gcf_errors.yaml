@@ -19,15 +19,15 @@ slo_name:        errors
 slo_target:      0.99
 backend:
   class:         Stackdriver
-  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
+  project_id:    ${SLO_GENERATOR_PROJECT_ID}
   method:        good_bad_ratio
   measurement:
     filter_good: >
-      project="${PROJECT_ID}"
+      project="${SLO_GENERATOR_PROJECT_ID}"
       metric.type="cloudfunctions.googleapis.com/function/execution_count"
       resource.type="cloud_function"
       metric.label."status"="ok"
     filter_valid:  >
-      project="${PROJECT_ID}"
+      project="${SLO_GENERATOR_PROJECT_ID}"
       metric.type="cloudfunctions.googleapis.com/function/execution_count"
       resource.type="cloud_function"

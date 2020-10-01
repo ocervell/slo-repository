@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:    gke
-feature_name:    flask
-slo_description: 99% of Flask app requests return a good HTTP code
-slo_name:        availability-sli
+service_name:    ob
+feature_name:    adservice
+slo_description: 99% of Online-Boutique adservice HTTP requests return with a valid HTTP code
+slo_name:        availability
 slo_target:      0.99
 backend:
-  class:         Prometheus
-  url:           ${PROMETHEUS_URL}
-  method:        query_sli
+  class:         StackdriverServiceMonitoring
+  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
+  method:        basic
   measurement:
-    expression:  >
-      sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}[window]))
-      /
-      sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/'}[window]))
+    cluster_istio:
+      project_id:        ${ONLINE_BOUTIQUE_PROJECT_ID}
+      location:          ${ONLINE_BOUTIQUE_LOCATION}
+      cluster_name:      ${ONLINE_BOUTIQUE_CLUSTER_NAME}
+      service_namespace: ${ONLINE_BOUTIQUE_NAMESPACE}
+      service_name:      adservice
+    availability:        {}
