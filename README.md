@@ -1,4 +1,4 @@
-# SLO Repository Sample
+# SLO Repository
 
 This repository is an example SLO repository for `slo-generator`, i.e the repository where all your
 SLOs will be stored.
