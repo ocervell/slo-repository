@@ -3,7 +3,7 @@
 This repository is an example SLO repository, i.e the repository where all your
 SLOs will be stored.
 
-The `slos/` folder contains folders that each map to one application:
+The `slos/` folder contains examples for real-world applications:
 
 * `providers/`:
   * `gcp`: GCP SLOs.
