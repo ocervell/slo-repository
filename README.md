@@ -6,7 +6,7 @@ SLOs will be stored.
 The `slos/` folder contains folders that each map to one application:
 
 * `providers/`:
-  `gcp`: GCP SLOs.
+  * `gcp`: GCP SLOs.
   
 * `apps/`:
   * `custom-example/`: Test SLOs for custom backends.
