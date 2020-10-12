@@ -20,13 +20,13 @@ slo_name:        latency
 slo_target:      0.99
 backend:
   class:         Stackdriver
-  project_id:    ${SLO_GENERATOR_PROJECT_ID}
+  project_id:    ${PROJECT_ID}
   method:        distribution_cut
   measurement:
     filter_valid: >
       metric.type="serviceruntime.googleapis.com/api/request_latencies"
       resource.type="consumed_api"
-      resource.label."project_id"="${SLO_GENERATOR_PROJECT_ID}"
+      resource.label."project_id"="${PROJECT_ID}"
       resource.label."service"="bigquery.googleapis.com"
     good_below_threshold: true
     threshold_bucket: 17

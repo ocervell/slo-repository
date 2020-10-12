@@ -36,15 +36,20 @@ locals {
 
   # SLO configs
   slo_configs = [
-    for file in fileset(path.module, "../../slos/**/slo_*.yaml") :
+    for file in fileset(path.module, "../../slos/**/**/slo_*.yaml") :
     merge(yamldecode(templatefile(file,
       {
-        DATADOG_API_KEY             = var.backends.datadog.api_key
-        DATADOG_APP_KEY             = var.backends.datadog.app_key
-        DATADOG_SLO_ID              = var.backends.datadog.slo_id
-        PROMETHEUS_URL              = var.backends.prometheus.url
-        PROJECT_ID                  = var.project_id
-        STACKDRIVER_HOST_PROJECT_ID = var.backends.stackdriver.host_project_id
+        DATADOG_API_KEY              = var.backends.datadog.api_key
+        DATADOG_APP_KEY              = var.backends.datadog.app_key
+        DATADOG_SLO_ID               = var.backends.datadog.slo_id
+        PROMETHEUS_URL               = var.backends.prometheus.url
+        PROJECT_ID                   = var.project_id
+        STACKDRIVER_HOST_PROJECT_ID  = var.backends.stackdriver.host_project_id
+        ONLINE_BOUTIQUE_PROJECT_ID   = var.apps.online_boutique.project_id
+        ONLINE_BOUTIQUE_LOCATION     = var.apps.online_boutique.location
+        ONLINE_BOUTIQUE_CLUSTER_NAME = var.apps.online_boutique.cluster_name
+        ONLINE_BOUTIQUE_NAMESPACE    = var.apps.online_boutique.namespace
+
       })), {
       exporters = local.exporters.slo
     })
@@ -56,16 +61,22 @@ locals {
 }
 
 module "slo-pipeline" {
-  source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
+  source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=terraform-0.13-upgrade"
+  # source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
+  # version               = "0.2.2"
   project_id            = var.project_id
   region                = var.region
   exporters             = local.exporters.pipeline
   slo_generator_version = var.slo_generator_version
+  dataset_create        = false
+  pubsub_topic_name     = "slo-generator-export"
 }
 
 module "slos" {
-  for_each                   = local.slo_configs_map
-  source                     = "terraform-google-modules/slo/google//modules/slo"
+  for_each = local.slo_configs_map
+  source   = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=terraform-0.13-upgrade"
+  # source                     = "terraform-google-modules/slo/google//modules/slo"
+  # version                    = "0.2.2"
   schedule                   = var.schedule
   region                     = var.region
   project_id                 = var.project_id
@@ -73,6 +84,7 @@ module "slos" {
   config                     = each.value
   error_budget_policy        = local.error_budget_policy
   service_account_email      = var.service_account_email
+  grant_iam_roles            = true
   use_custom_service_account = true
   slo_generator_version      = var.slo_generator_version
 }

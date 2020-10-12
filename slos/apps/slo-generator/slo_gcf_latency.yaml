@@ -19,11 +19,11 @@ slo_name:        latency
 slo_target:      0.99
 backend:
   class:         Stackdriver
-  project_id:    ${SLO_GENERATOR_PROJECT_ID}
+  project_id:    ${PROJECT_ID}
   method:        distribution_cut
   measurement:
     filter_valid: >
-      project="${SLO_GENERATOR_PROJECT_ID}"
+      project="${PROJECT_ID}"
       resource.type="cloud_function"
       metric.type="cloudfunctions.googleapis.com/function/execution_times"
       metric.label."status"="ok"

@@ -15,18 +15,18 @@
 service_name:    generator
 feature_name:    pubsub
 slo_description: 99% of outstanding PubSub messages are acknowledged
-slo_name:        ack
+slo_name:        coverage
 slo_target:      0.99
 backend:
   class:         Stackdriver
-  project_id:    ${SLO_GENERATOR_PROJECT_ID}
+  project_id:    ${PROJECT_ID}
   method:        good_bad_ratio
   measurement:
     filter_good: >
-      project="${SLO_GENERATOR_PROJECT_ID}"
+      project="${PROJECT_ID}"
       metric.type="pubsub.googleapis.com/subscription/ack_message_count"
       resource.type="pubsub_subscription"
     filter_bad:  >
-      project="${SLO_GENERATOR_PROJECT_ID}"
+      project="${PROJECT_ID}"
       metric.type="pubsub.googleapis.com/subscription/num_outstanding_messages"
       resource.type="pubsub_subscription"

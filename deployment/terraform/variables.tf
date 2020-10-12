@@ -22,6 +22,11 @@ variable "slo_generator_version" {
   description = "SLO Generator version"
 }
 
+variable "apps" {
+  description = "Apps variables"
+  type        = map
+}
+
 variable "backends" {
   description = "Backends options"
   type        = map
