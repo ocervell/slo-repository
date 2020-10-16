@@ -14,17 +14,10 @@
 ---
 - error_budget_policy_step_name: 1d
   measurement_window_seconds: 86400
-  alerting_burn_rate_threshold: 3
+  alerting_burn_rate_threshold: 6
   urgent_notification: true
   overburned_consequence_message: Page to defend the SLO
   achieved_consequence_message: Last day on track
-
-- error_budget_policy_step_name: 3d
-  measurement_window_seconds: 259200
-  alerting_burn_rate_threshold: 2
-  urgent_notification: true
-  overburned_consequence_message: Page to defend the SLO
-  achieved_consequence_message: Last 3d on track
 
 - error_budget_policy_step_name: 7d
   measurement_window_seconds: 604800

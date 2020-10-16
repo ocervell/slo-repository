@@ -18,6 +18,10 @@ variable "project_id" {
   description = "Project id"
 }
 
+variable "bucket_name" {
+  description = "Bucket name for SLO configs"
+}
+
 variable "slo_generator_version" {
   description = "SLO Generator version"
 }
