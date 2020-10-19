@@ -42,9 +42,25 @@ locals {
   error_budget_policy     = yamldecode(file("../../slos/error_budget_policy.yaml"))
   error_budget_policy_ssm = yamldecode(file("../../slos/error_budget_policy_ssm.yaml"))
 
+  # Required because TF does not support complex types (optional map args, maps
+  # with different types, ...).
+  default_exporter_settings = {
+    project_id                 = null
+    app_key                    = null
+    api_key                    = null
+    api_token                  = null
+    api_url                    = null
+    dataset_id                 = null
+    table_id                   = null
+    topic_name                 = null
+    location                   = null
+    delete_contents_on_destroy = false
+    metrics                    = []
+  }
+
   # SLO configs
   slo_configs = [
-    for file in fileset(path.module, "../../slos/**/**/slo_*.yaml") :
+    for file in fileset(path.module, "../../slos/online-boutique/**/slo_*.yaml") :
     merge(yamldecode(templatefile(file,
       {
         PROJECT_ID                   = var.project_id
@@ -60,7 +76,10 @@ locals {
         ONLINE_BOUTIQUE_CLUSTER_NAME = var.apps.online_boutique.cluster_name
         ONLINE_BOUTIQUE_NAMESPACE    = var.apps.online_boutique.namespace
       })), {
-      exporters = local.exporters.slo
+      exporters = [
+        for exporter in local.exporters.slo:
+        merge(local.default_exporter_settings, exporter)
+      ]
     })
   ]
   slo_configs_map = {
@@ -71,7 +90,7 @@ locals {
 
 resource "google_service_account" "slo" {
   project    = var.project_id
-  account_id = "slo-ops"
+  account_id = var.service_account_name
 }
 
 resource "google_storage_bucket" "slos" {
@@ -82,13 +101,13 @@ resource "google_storage_bucket" "slos" {
 }
 
 module "slo-pipeline" {
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=fix-gcs-links"
-  source                = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
+  source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=slo-generator-v1.3.0"
+  # source                = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
   # source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
   # version               = "0.2.2"
   project_id            = var.project_id
   region                = var.region
-  exporters             = local.exporters.pipeline
+  exporters             = [for exporter in local.exporters.pipeline: merge(local.default_exporter_settings, exporter)]
   slo_generator_version = var.slo_generator_version
   dataset_create        = false
   pubsub_topic_name     = "slo-generator-export"
@@ -96,8 +115,8 @@ module "slo-pipeline" {
 
 module "slos" {
   for_each = local.slo_configs_map
-  # source   = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=fix-gcs-links"
-  source                     = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
+  source   = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=slo-generator-v1.3.0"
+  # source                     = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
   # source                     = "terraform-google-modules/slo/google//modules/slo"
   # version                    = "0.2.2"
   schedule                   = var.schedule
