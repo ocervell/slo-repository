@@ -1,0 +1,27 @@
+---
+steps:
+
+- name: gcr.io/$PROJECT_ID/terraform:0.13.2
+  id: Init
+  dir: ${_COMPONENT}/
+  args:
+  - init
+
+- name: gcr.io/$PROJECT_ID/terraform:0.13.2
+  id: Select workspace
+  dir: ${_COMPONENT}/
+  args:
+  - workspace
+  - select
+  - ${_ENV}
+
+- name: gcr.io/$PROJECT_ID/terraform:0.13.2
+  id: Run Terraform apply
+  dir: ${_COMPONENT}/
+  args:
+  - apply
+  - -auto-approve
+
+substitutions:
+  _COMPONENT: deployment/terraform
+  _ENV: default

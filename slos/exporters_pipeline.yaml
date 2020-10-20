@@ -12,28 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-slo:
-  - class: Pubsub
-    project_id: ${PROJECT_ID}
-    topic_name: ${PUBSUB_TOPIC_NAME}
+- class: Bigquery
+  project_id: ${PROJECT_ID}
+  dataset_id: ${BIGQUERY_DATASET_ID}
+  table_id: ${BIGQUERY_TABLE_ID}
 
-pipeline:
-  - class: Bigquery
-    project_id: ${PROJECT_ID}
-    dataset_id: ${BIGQUERY_DATASET_ID}
-    table_id: ${BIGQUERY_TABLE_ID}
+- class: Stackdriver
+  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+  metrics:
+    - error_budget_burn_rate
+    - sli_measurement
+    - slo_target
 
-  - class: Stackdriver
-    project_id: ${STACKDRIVER_HOST_PROJECT_ID}
-    metrics:
-      - error_budget_burn_rate
-      - sli_measurement
-      - slo_target
+- class: Datadog
+  api_key: ${DATADOG_API_KEY}
+  app_key: ${DATADOG_APP_KEY}
 
-  - class: Datadog
-    api_key: ${DATADOG_API_KEY}
-    app_key: ${DATADOG_APP_KEY}
-  
-  - class: Dynatrace
-    api_token: ${DYNATRACE_API_TOKEN}
-    api_url: ${DYNATRACE_API_URL}
+- class: Dynatrace
+  api_token: ${DYNATRACE_API_TOKEN}
+  api_url: ${DYNATRACE_API_URL}
+
+# - class: Prometheus
+#   url: ${PROMETHEUS_PUSH_URL}
