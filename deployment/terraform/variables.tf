@@ -52,10 +52,6 @@ variable "labels" {
 }
 
 variable "service_account_name" {
-<<<<<<< HEAD
   description = "Service account email"
   type        = string
-=======
-  description = "Service account name for SLO computations"
->>>>>>> to-merge
 }
