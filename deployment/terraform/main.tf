@@ -56,7 +56,7 @@ locals {
 
   # SLO configs
   slo_configs = [
-    for file in fileset(path.module, "../../slos/online-boutique/**/slo_*.yaml") :
+    for file in fileset(path.module, "../../slos/**/**/slo_*.yaml") :
     merge(yamldecode(templatefile(file,
       {
         PROJECT_ID                   = var.project_id
@@ -122,5 +122,5 @@ module "slos" {
   use_custom_service_account = true
   slo_generator_version      = var.slo_generator_version
   config_bucket              = google_storage_bucket.slos.name
-  extra_files                = each.value.backend.class == "backends.CustomBackend" ? [local.custom_files] : []
+  extra_files                = each.value.backend.class == "backends.CustomBackend" ? local.custom_files : []
 }
