@@ -11,14 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
----
-service_name:    test
-feature_name:    custom
-slo_name:        slo
-slo_description: 99% of blabla
-slo_target:      0.99
-backend:
-  class:         backends.CustomBackend
-  method:        query_sli
-exporters:
-  class:         exporters.CustomExporter
+
+
+class CustomExporter:
+
+    def __init__(self, **kwargs):
+        pass
+
+    def export(self, *args, **kwargs):
+        return {'status': 200}
