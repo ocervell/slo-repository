@@ -14,9 +14,9 @@
 ---
 service_name:    generator
 feature_name:    pubsub
-slo_description: 99% of outstanding PubSub messages are acknowledged
+slo_description: 90% of outstanding PubSub messages are acknowledged
 slo_name:        coverage
-slo_target:      0.99
+slo_target:      0.90
 backend:
   class:         Stackdriver
   project_id:    ${PROJECT_ID}
