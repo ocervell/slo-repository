@@ -23,6 +23,18 @@ provider "google-beta" {
 }
 
 locals {
+  # Custom backends / exporters
+  custom_files = [
+    {
+      content = file("../../custom/backends.py")
+      filename = "backends.py"
+    },
+    {
+      content = file("../../custom/exporters.py")
+      filename = "exporters.py"
+    }
+  ]
+
   # Exporters (common)
   exporters = yamldecode(templatefile("../../slos/exporters.yaml",
     {
@@ -71,7 +83,7 @@ locals {
 
 resource "google_service_account" "slo" {
   project    = var.project_id
-  account_id = "slo-ops"
+  account_id = var.service_account_name
 }
 
 resource "google_storage_bucket" "slos" {
@@ -82,8 +94,8 @@ resource "google_storage_bucket" "slos" {
 }
 
 module "slo-pipeline" {
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=fix-gcs-links"
-  source                = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
+  source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=release-v0.3.0"
+  # source                = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
   # source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
   # version               = "0.2.2"
   project_id            = var.project_id
@@ -96,8 +108,8 @@ module "slo-pipeline" {
 
 module "slos" {
   for_each = local.slo_configs_map
-  # source   = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=fix-gcs-links"
-  source                     = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
+  source   = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=release-v0.3.0"
+  # source                     = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
   # source                     = "terraform-google-modules/slo/google//modules/slo"
   # version                    = "0.2.2"
   schedule                   = var.schedule
@@ -110,4 +122,5 @@ module "slos" {
   use_custom_service_account = true
   slo_generator_version      = var.slo_generator_version
   config_bucket              = google_storage_bucket.slos.name
+  extra_files                = each.value.backend.class == "backends.CustomBackend" ? [local.custom_files] : []
 }

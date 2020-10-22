@@ -51,7 +51,6 @@ variable "labels" {
   default     = {}
 }
 
-variable "service_account_email" {
-  description = "Service account email"
-  type        = string
+variable "service_account_name" {
+  description = "Service account name for SLO computations"
 }
