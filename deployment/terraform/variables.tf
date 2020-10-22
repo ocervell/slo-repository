@@ -53,4 +53,5 @@ variable "labels" {
 
 variable "service_account_name" {
   description = "Service account name for SLO computations"
+  type        = string
 }

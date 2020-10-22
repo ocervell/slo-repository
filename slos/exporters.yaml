@@ -25,6 +25,10 @@ pipeline:
 
   - class: Stackdriver
     project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+    metrics:
+      - error_budget_burn_rate
+      - sli_measurement
+      - slo_target
 
   - class: Datadog
     api_key: ${DATADOG_API_KEY}
