@@ -94,10 +94,10 @@ resource "google_storage_bucket" "slos" {
 }
 
 module "slo-pipeline" {
-  source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=release-v0.3.0"
+  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=release-v0.3.0"
   # source                = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
-  # source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
-  # version               = "0.2.2"
+  source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
+  version               = "0.3.0"
   project_id            = var.project_id
   region                = var.region
   exporters             = local.exporters.pipeline
@@ -108,10 +108,10 @@ module "slo-pipeline" {
 
 module "slos" {
   for_each = local.slo_configs_map
-  source   = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=release-v0.3.0"
+  # source   = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=release-v0.3.0"
   # source                     = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
-  # source                     = "terraform-google-modules/slo/google//modules/slo"
-  # version                    = "0.2.2"
+  source                     = "terraform-google-modules/slo/google//modules/slo"
+  version                    = "0.3.0"
   schedule                   = var.schedule
   region                     = var.region
   project_id                 = var.project_id
