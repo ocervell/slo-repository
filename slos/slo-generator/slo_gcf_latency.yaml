@@ -14,7 +14,7 @@
 ---
 service_name:    generator
 feature_name:    gcf
-slo_description: 99% of GCF executions are completed within 5s
+slo_description: 99% of GCF executions are completed within 10s
 slo_name:        latency
 slo_target:      0.99
 backend:
@@ -28,4 +28,4 @@ backend:
       metric.type="cloudfunctions.googleapis.com/function/execution_times"
       metric.label."status"="ok"
     good_below_threshold: true
-    threshold_bucket: 175
+    threshold_bucket: 143
