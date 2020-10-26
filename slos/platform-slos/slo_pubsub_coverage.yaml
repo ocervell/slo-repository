@@ -12,21 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:    generator
-feature_name:    gcf
-slo_description: 99% of GCF SLO executions are completed within 20s
-slo_name:        latency
-slo_target:      0.99
+service_name:    global
+feature_name:    pubsub
+slo_description: 90% of outstanding PubSub messages are acknowledged across all projects
+slo_name:        coverage
+slo_target:      0.90
 backend:
   class:         Stackdriver
   project_id:    ${PROJECT_ID}
-  method:        distribution_cut
+  method:        good_bad_ratio
   measurement:
-    filter_valid: >
-      project="${PROJECT_ID}"
-      resource.type="cloud_function"
-      metric.type="cloudfunctions.googleapis.com/function/execution_times"
-      resource.labels.function_name!="slo-pipeline"
-      metric.label."status"="ok"
-    good_below_threshold: true
-    threshold_bucket: 157
+    filter_good: >
+      metric.type="pubsub.googleapis.com/subscription/ack_message_count"
+      resource.type="pubsub_subscription"
+    filter_bad:  >
+      metric.type="pubsub.googleapis.com/subscription/num_outstanding_messages"
+      resource.type="pubsub_subscription"

@@ -94,28 +94,30 @@ resource "google_storage_bucket" "slos" {
 }
 
 module "slo-pipeline" {
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=release-v0.3.0"
-  # source                = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
-  source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
-  version               = "0.3.0"
+  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=add-gcf-timeout"
+  source                = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
+  # source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
+  # version               = "0.3.2"
   project_id            = var.project_id
   region                = var.region
   exporters             = local.exporters.pipeline
   slo_generator_version = var.slo_generator_version
   dataset_create        = false
   pubsub_topic_name     = "slo-generator-export"
+  function_timeout      = "90"
 }
 
 module "slos" {
   for_each = local.slo_configs_map
-  # source   = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=release-v0.3.0"
-  # source                     = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
-  source                     = "terraform-google-modules/slo/google//modules/slo"
-  version                    = "0.3.0"
+  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=add-gcf-timeout"
+  source                     = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
+  # source                     = "terraform-google-modules/slo/google//modules/slo"
+  # version                    = "0.3.2"
   schedule                   = var.schedule
   region                     = var.region
   project_id                 = var.project_id
   labels                     = var.labels
+  schedule                   = var.schedule 
   config                     = each.value
   error_budget_policy        = each.value.backend.class == "StackdriverServiceMonitoring" ? local.error_budget_policy_ssm : local.error_budget_policy
   service_account_email      = google_service_account.slo.email
@@ -123,4 +125,5 @@ module "slos" {
   slo_generator_version      = var.slo_generator_version
   config_bucket              = google_storage_bucket.slos.name
   extra_files                = each.value.backend.class == "backends.CustomBackend" ? local.custom_files : []
+  function_memory            = 256
 }
