@@ -19,7 +19,7 @@ slo_name:        latency
 slo_target:      0.99
 backend:
   class:         Stackdriver
-  project_id:    ${PROJECT_ID}
+  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
   method:        distribution_cut
   measurement:
     filter_valid: >

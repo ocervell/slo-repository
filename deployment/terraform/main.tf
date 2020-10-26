@@ -90,29 +90,30 @@ resource "google_storage_bucket" "slos" {
   project                     = var.project_id
   location                    = "EU"
   name                        = var.bucket_name
+  force_destroy               = true
   uniform_bucket_level_access = true
 }
 
 module "slo-pipeline" {
+  source = "terraform-google-modules/slo/google//modules/slo-pipeline"
+  version = "0.3.2"
+  # source = "../../../../../terraform/modules/terraform-google-slo"
   # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=add-gcf-timeout"
-  source                = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
-  # source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
-  # version               = "0.3.2"
   project_id            = var.project_id
   region                = var.region
+  pubsub_topic_name     = var.pubsub_topic_name
   exporters             = local.exporters.pipeline
   slo_generator_version = var.slo_generator_version
   dataset_create        = false
-  pubsub_topic_name     = "slo-generator-export"
   function_timeout      = "90"
 }
 
 module "slos" {
-  for_each = local.slo_configs_map
+  source                     = "terraform-google-modules/slo/google//modules/slo"
+  # source = "../../../../../terraform/modules/terraform-google-slo"
   # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=add-gcf-timeout"
-  source                     = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
-  # source                     = "terraform-google-modules/slo/google//modules/slo"
-  # version                    = "0.3.2"
+  version                    = "0.3.2"
+  for_each                   = local.slo_configs_map
   schedule                   = var.schedule
   region                     = var.region
   project_id                 = var.project_id

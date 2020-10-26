@@ -19,7 +19,7 @@ slo_name:        throughput
 slo_target:      0.99
 backend:
   class:         Stackdriver
-  project_id:    ${PROJECT_ID}
+  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
   method:        good_bad_ratio
   measurement:
     filter_good: >

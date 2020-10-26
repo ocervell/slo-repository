@@ -22,6 +22,11 @@ variable "bucket_name" {
   description = "Bucket name for SLO configs"
 }
 
+variable "pubsub_topic_name" {
+  description = "SLO Pipeline pubsub topic name"
+  default     = "slo-generator-export"
+}
+
 variable "slo_generator_version" {
   description = "SLO Generator version"
 }
