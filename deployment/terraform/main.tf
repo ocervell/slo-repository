@@ -117,7 +117,6 @@ module "slos" {
   region                     = var.region
   project_id                 = var.project_id
   labels                     = var.labels
-  schedule                   = var.schedule 
   config                     = each.value
   error_budget_policy        = each.value.backend.class == "StackdriverServiceMonitoring" ? local.error_budget_policy_ssm : local.error_budget_policy
   service_account_email      = google_service_account.slo.email
