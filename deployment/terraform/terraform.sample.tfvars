@@ -6,7 +6,7 @@ bucket_name = "<GCS_BUCKET_NAME>"
 
 pubsub_topic_name = "<PIPELINE_PUBSUB_TOPIC_NAME>"
 
-service_account_name = "<SLO_SERVICE_ACCOUTN_NAME>"
+service_account_name = "<SLO_SERVICE_ACCOUNT_NAME>"
 
 slo_generator_version = "1.3.2"
 
