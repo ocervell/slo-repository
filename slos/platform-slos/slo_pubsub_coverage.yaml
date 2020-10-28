@@ -14,12 +14,12 @@
 ---
 service_name:    global
 feature_name:    pubsub
-slo_description: 90% of outstanding PubSub messages are acknowledged across all projects
+slo_description: 75% of outstanding PubSub messages are acknowledged across all projects
 slo_name:        coverage
-slo_target:      0.90
+slo_target:      0.75
 backend:
   class:         Stackdriver
-  project_id:    ${PROJECT_ID}
+  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
   method:        good_bad_ratio
   measurement:
     filter_good: >
