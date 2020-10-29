@@ -1,0 +1,19 @@
+- class: Bigquery
+  project_id: ${BIGQUERY_PROJECT_ID}
+  dataset_id: ${BIGQUERY_DATASET_ID}
+  table_id: ${BIGQUERY_TABLE_ID}
+
+- class: Stackdriver
+  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+  # metrics:
+  #   - error_budget_burn_rate
+  #   - sli_measurement
+  #   - slo_target
+
+# - class: Datadog
+#   api_key: ${DATADOG_API_KEY}
+#   app_key: ${DATADOG_APP_KEY}
+
+# - class: Dynatrace
+#   api_token: ${DYNATRACE_API_TOKEN}
+#   api_url: ${DYNATRACE_API_URL}

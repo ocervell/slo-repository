@@ -30,3 +30,5 @@ backend:
       project="${PROJECT_ID}"
       metric.type="pubsub.googleapis.com/subscription/num_outstanding_messages"
       resource.type="pubsub_subscription"
+exporters:
+${SHARED_EXPORTERS}

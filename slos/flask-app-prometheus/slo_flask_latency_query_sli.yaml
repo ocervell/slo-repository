@@ -30,3 +30,5 @@ backend:
       increase(
         flask_http_request_duration_seconds_count{app="flask-app-tutorial", path='/', status=~"2.."}[window]
       )
+exporters:
+${SHARED_EXPORTERS}

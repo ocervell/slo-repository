@@ -30,3 +30,5 @@ backend:
       metric.labels.response_code < 500
     good_below_threshold: true
     threshold_bucket: 7
+exporters:
+${SHARED_EXPORTERS}

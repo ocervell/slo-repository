@@ -32,3 +32,5 @@ backend:
       metric.type="pubsub.googleapis.com/topic/send_message_operation_count"
       resource.type="pubsub_topic"
       resource.labels.topic_id:"scheduler-topic"
+exporters:
+${SHARED_EXPORTERS}

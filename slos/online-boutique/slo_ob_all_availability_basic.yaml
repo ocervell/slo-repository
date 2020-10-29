@@ -33,3 +33,5 @@ backend:
       resource.label.cluster_name="demo"
       metric.type="istio.io/service/server/request_count"
       resource.type="k8s_container"
+exporters:
+${SHARED_EXPORTERS}

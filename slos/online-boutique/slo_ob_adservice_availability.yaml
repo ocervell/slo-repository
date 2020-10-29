@@ -29,3 +29,5 @@ backend:
       service_namespace: ${ONLINE_BOUTIQUE_NAMESPACE}
       service_name:      adservice
     availability:        {}
+exporters:
+${SHARED_EXPORTERS}

@@ -35,49 +35,46 @@ locals {
     }
   ]
 
-  # Exporters (common)
-  exporters = yamldecode(templatefile("../../slos/exporters.yaml",
-    {
-      PROJECT_ID                  = var.project_id
-      STACKDRIVER_HOST_PROJECT_ID = var.backends.stackdriver.host_project_id
-      PUBSUB_TOPIC_NAME           = module.slo-pipeline.pubsub_topic_name
-      DATADOG_API_KEY             = var.backends.datadog.api_key
-      DATADOG_APP_KEY             = var.backends.datadog.app_key
-      DYNATRACE_API_TOKEN         = var.backends.dynatrace.api_token
-      DYNATRACE_API_URL           = var.backends.dynatrace.api_url
-      BIGQUERY_PROJECT_ID         = var.backends.bigquery.project_id
-      BIGQUERY_TABLE_ID           = var.backends.bigquery.table_id
-      BIGQUERY_DATASET_ID         = var.backends.bigquery.dataset_id
-  }))
+  # Exporters
+  exporters_path_pipeline = "../../slos/exporters_pipeline.yaml"
+  exporters_path_slo      = "../../slos/exporters_slo.yaml"
+  exporters_vars = {
+    PROJECT_ID                  = var.project_id
+    STACKDRIVER_HOST_PROJECT_ID = var.backends.stackdriver.host_project_id
+    PUBSUB_TOPIC_NAME           = module.slo-pipeline.pubsub_topic_name
+    DATADOG_API_KEY             = var.backends.datadog.api_key
+    DATADOG_APP_KEY             = var.backends.datadog.app_key
+    DYNATRACE_API_TOKEN         = var.backends.dynatrace.api_token
+    DYNATRACE_API_URL           = var.backends.dynatrace.api_url
+    BIGQUERY_PROJECT_ID         = var.backends.bigquery.project_id
+    BIGQUERY_TABLE_ID           = var.backends.bigquery.table_id
+    BIGQUERY_DATASET_ID         = var.backends.bigquery.dataset_id
+  }
 
   # Error budget policy (common)
-  error_budget_policy     = yamldecode(file("../../slos/error_budget_policy.yaml"))
-  error_budget_policy_ssm = yamldecode(file("../../slos/error_budget_policy_ssm.yaml"))
+  error_budget_policy_path     = "../../slos/error_budget_policy.yaml"
+  error_budget_policy_path_ssm = "../../slos/error_budget_policy_ssm.yaml"
 
   # SLO configs
-  slo_configs = [
-    for file in fileset(path.module, "../../slos/**/**/slo_*.yaml") :
-    merge(yamldecode(templatefile(file,
-      {
-        PROJECT_ID                   = var.project_id
-        STACKDRIVER_HOST_PROJECT_ID  = var.backends.stackdriver.host_project_id
-        PROMETHEUS_URL               = var.backends.prometheus.url
-        DATADOG_API_KEY              = var.backends.datadog.api_key
-        DATADOG_APP_KEY              = var.backends.datadog.app_key
-        DATADOG_SLO_ID               = var.backends.datadog.slo_id
-        DYNATRACE_API_TOKEN          = var.backends.dynatrace.api_token
-        DYNATRACE_API_URL            = var.backends.dynatrace.api_url
-        ONLINE_BOUTIQUE_PROJECT_ID   = var.apps.online_boutique.project_id
-        ONLINE_BOUTIQUE_LOCATION     = var.apps.online_boutique.location
-        ONLINE_BOUTIQUE_CLUSTER_NAME = var.apps.online_boutique.cluster_name
-        ONLINE_BOUTIQUE_NAMESPACE    = var.apps.online_boutique.namespace
-      })), {
-      exporters = local.exporters.slo
-    })
-  ]
+  slo_configs = fileset(path.module, "../../slos/**/**/slo_*.yaml")
+  slo_configs_vars = {
+    PROJECT_ID                   = var.project_id
+    STACKDRIVER_HOST_PROJECT_ID  = var.backends.stackdriver.host_project_id
+    PROMETHEUS_URL               = var.backends.prometheus.url
+    DATADOG_API_KEY              = var.backends.datadog.api_key
+    DATADOG_APP_KEY              = var.backends.datadog.app_key
+    DATADOG_SLO_ID               = var.backends.datadog.slo_id
+    DYNATRACE_API_TOKEN          = var.backends.dynatrace.api_token
+    DYNATRACE_API_URL            = var.backends.dynatrace.api_url
+    ONLINE_BOUTIQUE_PROJECT_ID   = var.apps.online_boutique.project_id
+    ONLINE_BOUTIQUE_LOCATION     = var.apps.online_boutique.location
+    ONLINE_BOUTIQUE_CLUSTER_NAME = var.apps.online_boutique.cluster_name
+    ONLINE_BOUTIQUE_NAMESPACE    = var.apps.online_boutique.namespace
+    SHARED_EXPORTERS             = templatefile(local.exporters_path_slo, local.exporters_vars)
+  }
   slo_configs_map = {
-    for config in local.slo_configs :
-    "${config.service_name}-${config.feature_name}-${config.slo_name}" => config
+    for conf in local.slo_configs:
+    conf => yamldecode(templatefile(conf, local.slo_configs_vars)).backend.class
   }
 }
 
@@ -95,35 +92,37 @@ resource "google_storage_bucket" "slos" {
 }
 
 module "slo-pipeline" {
-  source = "terraform-google-modules/slo/google//modules/slo-pipeline"
-  version = "0.3.2"
-  # source = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=add-gcf-timeout"
+  # source = "terraform-google-modules/slo/google//modules/slo-pipeline"
+  # version = "0.3.2"
+  source = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
+  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=slo-generator-v1.3.0-new"
   project_id            = var.project_id
   region                = var.region
   pubsub_topic_name     = var.pubsub_topic_name
-  exporters             = local.exporters.pipeline
+  exporters_path        = local.exporters_path_pipeline
+  exporters_vars        = local.exporters_vars
   slo_generator_version = var.slo_generator_version
   dataset_create        = false
   function_timeout      = "90"
 }
 
 module "slos" {
-  source                     = "terraform-google-modules/slo/google//modules/slo"
-  version                    = "0.3.2"
-  # source = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=add-gcf-timeout"
+  # source                     = "terraform-google-modules/slo/google//modules/slo"
+  # version                    = "0.3.2"
+  source = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
+  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=slo-generator-v1.3.0-new"
   for_each                   = local.slo_configs_map
   schedule                   = var.schedule
   region                     = var.region
   project_id                 = var.project_id
   labels                     = var.labels
-  config                     = each.value
-  error_budget_policy        = each.value.backend.class == "StackdriverServiceMonitoring" ? local.error_budget_policy_ssm : local.error_budget_policy
+  config_path                = each.key
+  config_vars                = local.slo_configs_vars
+  error_budget_policy_path   = each.value == "StackdriverServiceMonitoring" ? local.error_budget_policy_path_ssm : local.error_budget_policy_path
   service_account_email      = google_service_account.slo.email
   use_custom_service_account = true
   slo_generator_version      = var.slo_generator_version
   config_bucket              = google_storage_bucket.slos.name
-  extra_files                = each.value.backend.class == "backends.CustomBackend" ? local.custom_files : []
+  extra_files                = each.value == "backends.CustomBackend" ? local.custom_files : []
   function_memory            = 256
 }

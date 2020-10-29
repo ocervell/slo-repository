@@ -26,3 +26,5 @@ backend:
       sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}[window]))
       /
       sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/'}[window]))
+exporters:
+${SHARED_EXPORTERS}

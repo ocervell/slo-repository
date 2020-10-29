@@ -30,3 +30,5 @@ backend:
       metric.label."status"="ok"
     good_below_threshold: true
     threshold_bucket: 157
+exporters:
+${SHARED_EXPORTERS}
