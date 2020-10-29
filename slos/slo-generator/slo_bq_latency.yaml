@@ -35,10 +35,10 @@ ${SHARED_EXPORTERS}
 - class: Stackdriver
   project_id: ${PROJECT_ID}
   metrics:
-    - name: error_budget_burn_rate
-    - name: sli_measurement
-    - name: slo_target
-    - name: events_count
+    - name: dev/error_budget_burn_rate
+    - name: dev/sli_measurement
+    - name: dev/slo_target
+    - name: dev/events_count
       additional_labels:
         - good_events_count
         - bad_events_count
