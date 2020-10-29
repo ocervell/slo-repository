@@ -30,6 +30,3 @@ backend:
       resource.label."service"="bigquery.googleapis.com"
     good_below_threshold: true
     threshold_bucket: 17
-exporters:
-  - class: Stackdriver
-    project_id: ${STACKDRIVER_HOST_PROJECT_ID}
