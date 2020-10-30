@@ -49,6 +49,7 @@ locals {
     BIGQUERY_PROJECT_ID         = var.backends.bigquery.project_id
     BIGQUERY_TABLE_ID           = var.backends.bigquery.table_id
     BIGQUERY_DATASET_ID         = var.backends.bigquery.dataset_id
+    ENV                         = terraform.workspace
   }
 
   # Error budget policy (common)
