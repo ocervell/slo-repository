@@ -25,10 +25,14 @@ pipeline:
 
   - class: Stackdriver
     project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+    # will work in next version
     # metrics:
-    #   - error_budget_burn_rate
-    #   - sli_measurement
-    #   - slo_target
+    #   - name: error_budget_burn_rate
+    #     alias: ${ENV}/error_budget_burn_rate
+    #   - name: sli_measurement
+    #     alias: ${ENV}/sli_measurement
+    #   - name: slo_target
+    #     alias: ${ENV}/slo_target
 
   # - class: Datadog
   #   api_key: ${DATADOG_API_KEY}
