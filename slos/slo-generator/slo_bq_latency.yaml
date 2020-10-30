@@ -32,17 +32,3 @@ backend:
     threshold_bucket: 19
 exporters:
 ${SHARED_EXPORTERS}
-- class: Stackdriver
-  project_id: ${PROJECT_ID}
-  metrics:
-    - name:  error_budget_burn_rate
-      alias: generator/error_budget_burn_rate
-    - name:  sli_measurement
-      alias: generator/sli_measurement
-    - name:  slo_target
-      alias: generator/slo_target
-    - name:  events_count
-      alias: generator/events_count
-      additional_labels:
-        - good_events_count
-        - bad_events_count

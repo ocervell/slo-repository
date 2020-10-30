@@ -5,10 +5,18 @@
 
 - class: Stackdriver
   project_id: ${STACKDRIVER_HOST_PROJECT_ID}
-  # metrics:
-  #   - error_budget_burn_rate
-  #   - sli_measurement
-  #   - slo_target
+  metrics:
+    - name: error_budget_burn_rate
+      alias: ${ENV}/error_budget_burn_rate
+    - name: sli_measurement
+      alias: ${ENV}/sli_measurement
+    - name: slo_target
+      alias: ${ENV}/slo_target
+    - name: events_count
+      alias: ${ENV}/events_count
+      additional_labels:
+        - good_events_count
+        - bad_events_count
 
 # - class: Datadog
 #   api_key: ${DATADOG_API_KEY}
