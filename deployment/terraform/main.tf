@@ -71,6 +71,7 @@ locals {
     ONLINE_BOUTIQUE_LOCATION     = var.apps.online_boutique.location
     ONLINE_BOUTIQUE_CLUSTER_NAME = var.apps.online_boutique.cluster_name
     ONLINE_BOUTIQUE_NAMESPACE    = var.apps.online_boutique.namespace
+    ENV                          = terraform.workspace
     SHARED_EXPORTERS             = templatefile(local.exporters_path_slo, local.exporters_vars)
   }
   slo_configs_map = {
@@ -103,7 +104,7 @@ module "slo-pipeline" {
   exporters_path        = local.exporters_path_pipeline
   exporters_vars        = local.exporters_vars
   slo_generator_version = var.slo_generator_version
-  dataset_create        = false
+  dataset_create        = var.dataset_create
   function_timeout      = "90"
 }
 

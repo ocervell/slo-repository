@@ -27,6 +27,11 @@ variable "pubsub_topic_name" {
   default     = "slo-generator-export"
 }
 
+variable "dataset_create" {
+  description = "Create dataset"
+  default     = true
+}
+
 variable "slo_generator_version" {
   description = "SLO Generator version"
 }
