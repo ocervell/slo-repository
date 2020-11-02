@@ -13,22 +13,24 @@
 # limitations under the License.
 ---
 service_name:    generator
-feature_name:    gcf
-slo_description: 99% of GCF SLO executions are completed within 20s
-slo_name:        latency
+feature_name:    slo
+slo_description: 99% of scheduled Cloud Functions are executed
+slo_name:        gcf-throughput
 slo_target:      0.99
 backend:
   class:         Stackdriver
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
-  method:        distribution_cut
+  method:        good_bad_ratio
   measurement:
-    filter_valid: >
+    filter_good: >
       project="${PROJECT_ID}"
+      metric.type="cloudfunctions.googleapis.com/function/execution_count"
       resource.type="cloud_function"
-      metric.type="cloudfunctions.googleapis.com/function/execution_times"
       resource.labels.function_name!="slo-pipeline"
-      metric.label."status"="ok"
-    good_below_threshold: true
-    threshold_bucket: 157
+    filter_valid:  >
+      project="${PROJECT_ID}"
+      metric.type="pubsub.googleapis.com/topic/send_message_operation_count"
+      resource.type="pubsub_topic"
+      resource.labels.topic_id:"scheduler-topic"
 exporters:
 ${SHARED_EXPORTERS}

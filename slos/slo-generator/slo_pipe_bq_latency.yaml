@@ -13,23 +13,23 @@
 # limitations under the License.
 ---
 service_name:    generator
-feature_name:    gcf
-slo_description: 99% of Cloud Functions complete with 'ok' status
-slo_name:        errors
+feature_name:    pipeline
+slo_description: >
+  99% of BigQuery API HTTP response latencies < 524ms
+slo_name:        bq-latency
 slo_target:      0.99
 backend:
   class:         Stackdriver
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
-  method:        good_bad_ratio
+  method:        distribution_cut
   measurement:
-    filter_good: >
-      project="${PROJECT_ID}"
-      metric.type="cloudfunctions.googleapis.com/function/execution_count"
-      resource.type="cloud_function"
+    filter_valid: >
+      metric.type="serviceruntime.googleapis.com/api/request_latencies"
+      resource.type="consumed_api"
+      resource.label."project_id"="${PROJECT_ID}"
+      resource.label."service"="bigquery.googleapis.com"
       metric.label."status"="ok"
-    filter_valid:  >
-      project="${PROJECT_ID}"
-      metric.type="cloudfunctions.googleapis.com/function/execution_count"
-      resource.type="cloud_function"
+    good_below_threshold: true
+    threshold_bucket: 19
 exporters:
 ${SHARED_EXPORTERS}

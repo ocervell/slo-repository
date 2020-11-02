@@ -13,10 +13,10 @@
 # limitations under the License.
 ---
 service_name:    generator
-feature_name:    pubsub
-slo_description: 90% of outstanding PubSub messages are acknowledged
-slo_name:        coverage
-slo_target:      0.90
+feature_name:    slo
+slo_description: 99% of Cloud Functions complete with 'ok' status
+slo_name:        gcf-errors
+slo_target:      0.99
 backend:
   class:         Stackdriver
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
@@ -24,11 +24,14 @@ backend:
   measurement:
     filter_good: >
       project="${PROJECT_ID}"
-      metric.type="pubsub.googleapis.com/subscription/ack_message_count"
-      resource.type="pubsub_subscription"
-    filter_bad:  >
+      metric.type="cloudfunctions.googleapis.com/function/execution_count"
+      resource.type="cloud_function"
+      resource.labels.function_name!="slo-pipeline"
+      metric.label."status"="ok"
+    filter_valid:  >
       project="${PROJECT_ID}"
-      metric.type="pubsub.googleapis.com/subscription/num_outstanding_messages"
-      resource.type="pubsub_subscription"
+      metric.type="cloudfunctions.googleapis.com/function/execution_count"
+      resource.type="cloud_function"
+      resource.labels.function_name!="slo-pipeline"
 exporters:
 ${SHARED_EXPORTERS}
