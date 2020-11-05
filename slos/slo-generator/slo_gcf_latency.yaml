@@ -14,7 +14,7 @@
 ---
 service_name:    generator
 feature_name:    gcf
-slo_description: 99% of GCF SLO executions are completed within 20s
+slo_description: 99% of GCF SLO executions are completed within 10s
 slo_name:        latency
 slo_target:      0.99
 backend:
@@ -29,4 +29,4 @@ backend:
       resource.labels.function_name!="slo-pipeline"
       metric.label."status"="ok"
     good_below_threshold: true
-    threshold_bucket: 157
+    threshold_bucket: 143
