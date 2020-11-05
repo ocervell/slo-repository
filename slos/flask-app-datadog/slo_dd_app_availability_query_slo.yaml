@@ -24,3 +24,5 @@ backend:
   app_key:       ${DATADOG_APP_KEY}
   measurement:
     slo_id:      ${DATADOG_SLO_ID}
+exporters:
+${SHARED_EXPORTERS}

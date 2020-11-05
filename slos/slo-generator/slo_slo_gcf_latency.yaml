@@ -12,19 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:    gke
-feature_name:    flask
-slo_description: 99% of Flask app requests return a good HTTP code
-slo_name:        availability-sli
+service_name:    generator
+feature_name:    slo
+slo_description: 99% of GCF SLO executions are completed within 20s
+slo_name:        gcf-latency
 slo_target:      0.99
 backend:
-  class:         Prometheus
-  url:           ${PROMETHEUS_URL}
-  method:        query_sli
+  class:         Stackdriver
+  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
+  method:        distribution_cut
   measurement:
-    expression:  >
-      sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}[window]))
-      /
-      sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/'}[window]))
+    filter_valid: >
+      project="${PROJECT_ID}"
+      resource.type="cloud_function"
+      metric.type="cloudfunctions.googleapis.com/function/execution_times"
+      resource.labels.function_name!="slo-pipeline"
+      metric.label."status"="ok"
+    good_below_threshold: true
+    threshold_bucket: 157
 exporters:
 ${SHARED_EXPORTERS}

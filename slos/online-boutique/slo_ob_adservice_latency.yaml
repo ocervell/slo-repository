@@ -30,3 +30,5 @@ backend:
       service_name:      adservice
     latency:
       threshold: 8 # ms
+exporters:
+${SHARED_EXPORTERS}

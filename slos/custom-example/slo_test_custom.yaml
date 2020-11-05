@@ -21,4 +21,5 @@ backend:
   class:         backends.CustomBackend
   method:        query_sli
 exporters:
-  class:         exporters.CustomExporter
+${SHARED_EXPORTERS}
+- class: exporters.CustomExporter

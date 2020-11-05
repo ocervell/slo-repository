@@ -24,3 +24,5 @@ backend:
   app_key:       ${DATADOG_APP_KEY}
   measurement:
     query: sum:flask_app_hello_requests.count{http.path:/, http.status_code_class:2xx}.as_count() / sum:flask_app_hello_requests.count{http.path:/}.as_count()
+exporters:
+${SHARED_EXPORTERS}

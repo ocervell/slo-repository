@@ -24,3 +24,5 @@ backend:
   measurement:
     expression:       flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}
     threshold_bucket: 0.25 # in seconds, corresponds to the `le` (less than) PromQL label
+exporters:
+${SHARED_EXPORTERS}
