@@ -14,9 +14,9 @@
 ---
 service_name:    generator
 feature_name:    pubsub
-slo_description: 90% of outstanding PubSub messages are acknowledged
+slo_description: 99% of PubSub messages are acknowledged
 slo_name:        coverage
-slo_target:      0.90
+slo_target:      0.99
 backend:
   class:         Stackdriver
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
@@ -28,5 +28,5 @@ backend:
       resource.type="pubsub_subscription"
     filter_bad:  >
       project="${PROJECT_ID}"
-      metric.type="pubsub.googleapis.com/subscription/num_outstanding_messages"
+      metric.type="pubsub.googleapis.com/subscription/num_undelivered_messages"
       resource.type="pubsub_subscription"
