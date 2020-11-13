@@ -17,6 +17,8 @@ feature_name:    adservice
 slo_description: 99% of Online-Boutique adservice HTTP requests return in less than 8ms
 slo_name:        latency
 slo_target:      0.99
+metadata:
+  env: ${ENV}
 backend:
   class:         StackdriverServiceMonitoring
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}

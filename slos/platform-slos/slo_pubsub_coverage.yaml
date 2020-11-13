@@ -17,6 +17,8 @@ feature_name:    pubsub
 slo_description: 75% of outstanding PubSub messages are acknowledged across all projects
 slo_name:        coverage
 slo_target:      0.75
+metadata:
+  env: ${ENV}
 backend:
   class:         Stackdriver
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}

@@ -17,6 +17,8 @@ feature_name:    custom
 slo_name:        slo
 slo_description: 99% of blabla
 slo_target:      0.99
+metadata:
+  env: ${ENV}
 backend:
   class:         backends.CustomBackend
   method:        query_sli

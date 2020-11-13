@@ -17,6 +17,8 @@ feature_name:     flask
 slo_description:  99% of Flask app requests return a good HTTP code
 slo_name:         availability-ratio
 slo_target:       0.99
+metadata:
+  env: ${ENV}
 backend:
   class:          Prometheus
   url:            ${PROMETHEUS_URL}

@@ -17,6 +17,8 @@ feature_name:    app
 slo_name:        availability-ratio
 slo_description: 99% of Flask app requests return a valid HTTP code
 slo_target:      0.99
+metadata:
+  env: ${ENV}
 backend:
   class:         Datadog
   method:        good_bad_ratio

@@ -56,8 +56,9 @@ locals {
   error_budget_policy_ssm = yamldecode(file("../../slos/error_budget_policy_ssm.yaml"))
 
   # SLO configs
+  files = fileset(path.module, "../../slos/**/slo_*.yaml")
   slo_configs = [
-    for file in fileset(path.module, "../../slos/**/**/slo_*.yaml") :
+    for file in local.files :
     merge(yamldecode(templatefile(file,
       {
         PROJECT_ID                   = var.project_id
@@ -72,6 +73,7 @@ locals {
         ONLINE_BOUTIQUE_LOCATION     = var.apps.online_boutique.location
         ONLINE_BOUTIQUE_CLUSTER_NAME = var.apps.online_boutique.cluster_name
         ONLINE_BOUTIQUE_NAMESPACE    = var.apps.online_boutique.namespace
+        ENV                          = terraform.workspace
       })), {
       exporters = local.exporters.slo
     })
@@ -96,10 +98,10 @@ resource "google_storage_bucket" "slos" {
 }
 
 module "slo-pipeline" {
-  source = "terraform-google-modules/slo/google//modules/slo-pipeline"
-  version = "0.3.2"
-  # source = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=add-gcf-timeout"
+  # source = "terraform-google-modules/slo/google//modules/slo-pipeline"
+  # version = "0.3.2"
+  source = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
+  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=master"
   project_id            = var.project_id
   region                = var.region
   pubsub_topic_name     = var.pubsub_topic_name
@@ -110,10 +112,10 @@ module "slo-pipeline" {
 }
 
 module "slos" {
-  source                     = "terraform-google-modules/slo/google//modules/slo"
-  version                    = "0.3.2"
-  # source = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=add-gcf-timeout"
+  # source                     = "terraform-google-modules/slo/google//modules/slo"
+  # version                    = "0.3.2"
+  source = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
+  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=master"
   for_each                   = local.slo_configs_map
   schedule                   = var.schedule
   region                     = var.region
