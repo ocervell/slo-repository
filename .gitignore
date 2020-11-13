@@ -2,3 +2,4 @@ terraform.tfvars
 terraform.tfstate
 .terraform/
 config.tf
+*.tfvars
