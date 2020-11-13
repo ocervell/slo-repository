@@ -14,8 +14,8 @@
 ---
 service_name:    generator
 feature_name:    gcf
-slo_description: 99% of scheduled Cloud Functions are executed
-slo_name:        throughput
+slo_description: 99% of GCF SLO pipeline executions are completed within 13s
+slo_name:        latency-pipeline
 slo_target:      0.99
 metadata:
   env:           ${ENV}
@@ -23,15 +23,13 @@ metadata:
 backend:
   class:         Stackdriver
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
-  method:        good_bad_ratio
+  method:        distribution_cut
   measurement:
-    filter_good: >
+    filter_valid: >
       project="${PROJECT_ID}"
-      metric.type="cloudfunctions.googleapis.com/function/execution_count"
       resource.type="cloud_function"
-      resource.labels.function_name!="slo-pipeline"
-    filter_valid:  >
-      project="${PROJECT_ID}"
-      metric.type="pubsub.googleapis.com/topic/send_message_operation_count"
-      resource.type="pubsub_topic"
-      resource.labels.topic_id:"scheduler-topic"
+      metric.type="cloudfunctions.googleapis.com/function/execution_times"
+      resource.labels.function_name="slo-pipeline"
+      metric.label."status"="ok"
+    good_below_threshold: true
+    threshold_bucket: 148

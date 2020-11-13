@@ -19,7 +19,7 @@ slo_name:        errors
 slo_target:      0.99
 metadata:
   env: ${ENV}
-  new: test
+  component: all
 backend:
   class:         Stackdriver
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}

@@ -20,6 +20,7 @@ slo_name:        latency
 slo_target:      0.99
 metadata:
   env: ${ENV}
+  component: all
 backend:
   class:         Stackdriver
   project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
