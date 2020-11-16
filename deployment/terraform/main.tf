@@ -98,10 +98,8 @@ resource "google_storage_bucket" "slos" {
 }
 
 module "slo-pipeline" {
-  # source = "terraform-google-modules/slo/google//modules/slo-pipeline"
-  # version = "0.3.2"
-  source = "../../../../../terraform/modules/terraform-google-slo//modules/slo-pipeline"
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo-pipeline?ref=master"
+  source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
+  version               = "1.0.0"
   project_id            = var.project_id
   region                = var.region
   pubsub_topic_name     = var.pubsub_topic_name
@@ -112,10 +110,8 @@ module "slo-pipeline" {
 }
 
 module "slos" {
-  # source                     = "terraform-google-modules/slo/google//modules/slo"
-  # version                    = "0.3.2"
-  source = "../../../../../terraform/modules/terraform-google-slo//modules/slo"
-  # source = "git::https://github.com/terraform-google-modules/terraform-google-slo.git//modules/slo?ref=master"
+  source                     = "terraform-google-modules/slo/google//modules/slo"
+  version                    = "1.0.0"
   for_each                   = local.slo_configs_map
   schedule                   = var.schedule
   region                     = var.region
