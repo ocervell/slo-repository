@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:    gke
-feature_name:    flask
+service_name: gke
+feature_name: flask
 slo_description: 99% of Flask app requests return a good HTTP code
-slo_name:        availability-sli
-slo_target:      0.99
+slo_name: availability-sli
+slo_target: 0.99
 metadata:
   env: ${ENV}
 backend:
-  class:         Prometheus
-  url:           ${PROMETHEUS_URL}
-  method:        query_sli
+  class: Prometheus
+  url: ${PROMETHEUS_URL}
+  method: query_sli
   measurement:
-    expression:  >
+    expression: ∂>
       sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}[window]))
       /
       sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/'}[window]))

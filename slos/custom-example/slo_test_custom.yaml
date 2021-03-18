@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:    test
-feature_name:    custom
-slo_name:        slo
+service_name: test
+feature_name: custom
+slo_name: slo
 slo_description: 99% of blabla
-slo_target:      0.99
+slo_target: 0.99
 metadata:
   env: ${ENV}
 backend:
-  class:         backends.CustomBackend
-  method:        query_sli
+  class: backends.CustomBackend
+  method: query_sli
 exporters:
-  class:         exporters.CustomExporter
+  class: exporters.CustomExporter

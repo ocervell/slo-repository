@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:         gke
-feature_name:         flask
-slo_description:      99% of Flask app requests return in less than 250ms
-slo_name:             latency-cut
-slo_target:           0.99
+service_name: gke
+feature_name: flask
+slo_description: 99% of Flask app requests return in less than 250ms
+slo_name: latency-cut
+slo_target: 0.99
 metadata:
   env: ${ENV}
 backend:
-  class:              Prometheus
-  url:                ${PROMETHEUS_URL}
-  method:             distribution_cut
+  class: Prometheus
+  url: ${PROMETHEUS_URL}
+  method: distribution_cut
   measurement:
-    expression:       flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}
+    expression∂: flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}
     threshold_bucket: 0.25 # in seconds, corresponds to the `le` (less than) PromQL label
