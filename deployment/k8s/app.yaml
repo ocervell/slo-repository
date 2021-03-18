@@ -30,17 +30,14 @@ spec:
             - -f
             - /etc/config/slos/
             - -b
-            - /etc/config/error_budget_policy.yaml
+            - /etc/config/config.yaml
             - -e
             - "true"
             volumeMounts:
-              - name: error-budget-policy
-                mountPath: /etc/config/error_budget_policy.yaml
-                subPath: error_budget_policy.yaml
-              - name: slos
-                mountPath: /etc/config/slos
+              - name: config
+                mountPath: /etc/config/config.yaml
           volumes:
-            - name: error-budget-policy
+            - name: config
               configMap:
                 name: config
             - name: slos

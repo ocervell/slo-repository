@@ -12,20 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:    generator
-feature_name:    bq
-slo_description: >
-  99% of BigQuery API HTTP response latencies < 512ms
-slo_name:        latency
-slo_target:      0.99
+apiVersion: cloud.google.com/v1
+kind: ServiceLevelObjective
 metadata:
-  env:           ${ENV}
-  component:     all
-backend:
-  class:         Stackdriver
-  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
-  method:        distribution_cut
-  measurement:
+  name: generator-bq-latency
+  labels:
+    service_name: "generator"
+    feature_name: "bq"
+    slo_name: "latency"
+    component: "test"
+    # teams: ["service-feature-sre@google.com"]
+    # contact: ["app-team@google.com"]
+    # document: go/app-document
+    # approval_date: 2013-10-31
+spec:
+  description: 99% of BigQuery API HTTP response latencies < 512ms
+  goal: 0.99
+  backend: cloud_monitoring
+  exporters: [pubsub, cloud_monitoring, cloud_monitoring, bigquery]
+  error_budget_policy: standard
+  method: distribution_cut
+  serviceLevelIndicator:
     filter_valid: >
       metric.type="serviceruntime.googleapis.com/api/request_latencies"
       resource.type="consumed_api"
