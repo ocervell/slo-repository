@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:    generator
-feature_name:    gcf
+service_name: generator
+feature_name: gcf
 slo_description: 99% of GCF SLO executions are completed within 13s
-slo_name:        latency
-slo_target:      0.99
+slo_name: latency
+slo_target: 0.99
 metadata:
-  env:           ${ENV}
-  component:     slo
+  env: ${ENV}
+  component: slo
 backend:
-  class:         Stackdriver
-  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
-  method:        distribution_cut
+  class: Stackdriver
+  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+  method: distribution_cut
   measurement:
     filter_valid: >
       project="${PROJECT_ID}"

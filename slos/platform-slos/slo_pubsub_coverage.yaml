@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name:    global
-feature_name:    pubsub
+service_name: global
+feature_name: pubsub
 slo_description: 75% of outstanding PubSub messages are acknowledged across all projects
-slo_name:        coverage
-slo_target:      0.75
+slo_name: coverage
+slo_target: 0.75
 metadata:
   env: ${ENV}
 backend:
-  class:         Stackdriver
-  project_id:    ${STACKDRIVER_HOST_PROJECT_ID}
-  method:        good_bad_ratio
+  class: Stackdriver
+  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+  method: good_bad_ratio
   measurement:
     filter_good: >
       metric.type="pubsub.googleapis.com/subscription/ack_message_count"
       resource.type="pubsub_subscription"
-    filter_bad:  >
+    filter_bad: >
       metric.type="pubsub.googleapis.com/subscription/num_outstanding_messages"
       resource.type="pubsub_subscription"
