@@ -12,24 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name: generator
-feature_name: bq
-slo_description: >
-  99% of BigQuery API HTTP response latencies < 512ms
+service_name: ob
+feature_name: all
+slo_description: 99% of Online-Boutique HTTP requests return in less than 8ms
 slo_name: latency
 slo_target: 0.99
 metadata:
   env: ${ENV}
-  component: all
 backend:
   class: Stackdriver
   project_id: ${STACKDRIVER_HOST_PROJECT_ID}
   method: distribution_cut
   measurement:
     filter_valid: >
-      metric.type="serviceruntime.googleapis.com/api/request_latencies"
-      resource.type="consumed_api"
-      resource.label."project_id"="${PROJECT_ID}"
-      resource.label."service"="bigquery.googleapis.com"
+      project=${ONLINE_BOUTIQUE_PROJECT_ID}
+      resource.label.cluster_name="demo"
+      metric.type="istio.io/service/server/response_latencies"
+      resource.type="k8s_container"
+      metric.labels.response_code < 500
     good_below_threshold: true
-    threshold_bucket: 18
+    threshold_bucket: 7

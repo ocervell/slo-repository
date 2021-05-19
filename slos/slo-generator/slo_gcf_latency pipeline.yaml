@@ -13,23 +13,23 @@
 # limitations under the License.
 ---
 service_name: generator
-feature_name: bq
-slo_description: >
-  99% of BigQuery API HTTP response latencies < 512ms
-slo_name: latency
+feature_name: gcf
+slo_description: 99% of GCF SLO pipeline executions are completed within 13s
+slo_name: latency-pipeline
 slo_target: 0.99
 metadata:
   env: ${ENV}
-  component: all
+  component: pipeline
 backend:
   class: Stackdriver
   project_id: ${STACKDRIVER_HOST_PROJECT_ID}
   method: distribution_cut
   measurement:
     filter_valid: >
-      metric.type="serviceruntime.googleapis.com/api/request_latencies"
-      resource.type="consumed_api"
-      resource.label."project_id"="${PROJECT_ID}"
-      resource.label."service"="bigquery.googleapis.com"
+      project="${PROJECT_ID}"
+      resource.type="cloud_function"
+      metric.type="cloudfunctions.googleapis.com/function/execution_times"
+      resource.labels.function_name="slo-pipeline"
+      metric.label."status"="ok"
     good_below_threshold: true
-    threshold_bucket: 18
+    threshold_bucket: 148

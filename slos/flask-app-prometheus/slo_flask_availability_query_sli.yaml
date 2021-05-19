@@ -12,24 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name: generator
-feature_name: bq
-slo_description: >
-  99% of BigQuery API HTTP response latencies < 512ms
-slo_name: latency
+service_name: gke
+feature_name: flask
+slo_description: 99% of Flask app requests return a good HTTP code
+slo_name: availability-sli
 slo_target: 0.99
 metadata:
   env: ${ENV}
-  component: all
 backend:
-  class: Stackdriver
-  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
-  method: distribution_cut
+  class: Prometheus
+  url: ${PROMETHEUS_URL}
+  method: query_sli
   measurement:
-    filter_valid: >
-      metric.type="serviceruntime.googleapis.com/api/request_latencies"
-      resource.type="consumed_api"
-      resource.label."project_id"="${PROJECT_ID}"
-      resource.label."service"="bigquery.googleapis.com"
-    good_below_threshold: true
-    threshold_bucket: 18
+    expression: ∂>
+      sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}[window]))
+      /
+      sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/'}[window]))

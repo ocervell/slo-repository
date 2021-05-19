@@ -12,24 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name: generator
-feature_name: bq
-slo_description: >
-  99% of BigQuery API HTTP response latencies < 512ms
-slo_name: latency
-slo_target: 0.99
+service_name: global
+feature_name: pubsub
+slo_description: 75% of outstanding PubSub messages are acknowledged across all projects
+slo_name: coverage
+slo_target: 0.75
 metadata:
   env: ${ENV}
-  component: all
 backend:
   class: Stackdriver
   project_id: ${STACKDRIVER_HOST_PROJECT_ID}
-  method: distribution_cut
+  method: good_bad_ratio
   measurement:
-    filter_valid: >
-      metric.type="serviceruntime.googleapis.com/api/request_latencies"
-      resource.type="consumed_api"
-      resource.label."project_id"="${PROJECT_ID}"
-      resource.label."service"="bigquery.googleapis.com"
-    good_below_threshold: true
-    threshold_bucket: 18
+    filter_good: >
+      metric.type="pubsub.googleapis.com/subscription/ack_message_count"
+      resource.type="pubsub_subscription"
+    filter_bad: >
+      metric.type="pubsub.googleapis.com/subscription/num_outstanding_messages"
+      resource.type="pubsub_subscription"
