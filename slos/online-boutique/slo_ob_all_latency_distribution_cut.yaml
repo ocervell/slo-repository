@@ -1,29 +1,20 @@
-# Copyright 2020 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-service_name: ob
-feature_name: all
-slo_description: 99% of Online-Boutique HTTP requests return in less than 8ms
-slo_name: latency
-slo_target: 0.99
+apiVersion: sre.google.com/v2
+kind: ServiceLevelObjective
 metadata:
-  env: ${ENV}
-backend:
-  class: Stackdriver
-  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+  name: ob-all-latency
+  labels:
+    service_name: ob
+    feature_name: all
+    slo_name: latency
+    metadata:
+      env: ${ENV}
+spec:
+  description: 99% of Online-Boutique HTTP requests return in less than 8ms
+  error_budget_policy: cloud_service_monitoring
+  backend: cloud_monitoring
   method: distribution_cut
-  measurement:
+  exporters: []
+  service_level_indicator:
     filter_valid: >
       project=${ONLINE_BOUTIQUE_PROJECT_ID}
       resource.label.cluster_name="demo"
@@ -32,3 +23,4 @@ backend:
       metric.labels.response_code < 500
     good_below_threshold: true
     threshold_bucket: 7
+  goal: 0.99

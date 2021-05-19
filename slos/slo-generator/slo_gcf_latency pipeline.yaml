@@ -1,30 +1,20 @@
-# Copyright 2020 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-service_name: generator
-feature_name: gcf
-slo_description: 99% of GCF SLO pipeline executions are completed within 13s
-slo_name: latency-pipeline
-slo_target: 0.99
+apiVersion: sre.google.com/v2
+kind: ServiceLevelObjective
 metadata:
-  env: ${ENV}
-  component: pipeline
-backend:
-  class: Stackdriver
-  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+  name: generator-gcf-latency-pipeline
+  labels:
+    service_name: generator
+    feature_name: gcf
+    slo_name: latency-pipeline
+    metadata:
+      env: ${ENV}
+      component: pipeline
+spec:
+  description: 99% of GCF SLO pipeline executions are completed within 13s
+  backend: cloud_monitoring
   method: distribution_cut
-  measurement:
+  exporters: []
+  service_level_indicator:
     filter_valid: >
       project="${PROJECT_ID}"
       resource.type="cloud_function"
@@ -33,3 +23,4 @@ backend:
       metric.label."status"="ok"
     good_below_threshold: true
     threshold_bucket: 148
+  goal: 0.99
