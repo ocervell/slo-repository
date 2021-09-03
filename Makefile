@@ -23,18 +23,21 @@ load_env:
 	. .env
 
 slo-generator: load_env
-	slo-generator -f slos/slo-generator -b slos/error_budget_policy.yaml -e
+	slo-generator -f slos/slo-generator -b slos/error_budget_policy.yaml --export
 
 flask-app-datadog: load_env
-	slo-generator -f slos/flask-app-datadog -b slos/error_budget_policy.yaml -e
+	slo-generator -f slos/flask-app-datadog -b slos/error_budget_policy.yaml --export
 
 flask-app-prometheus: load_env
-	slo-generator -f slos/flask-app-prometheus -b slos/error_budget_policy.yaml -e
+	slo-generator -f slos/flask-app-prometheus -b slos/error_budget_policy.yaml --export
 
 online-boutique: load_env
-	slo-generator -f slos/online-boutique -b slos/error_budget_policy_ssm.yaml -e
+	slo-generator -f slos/online-boutique -b slos/error_budget_policy_ssm.yaml --export
 
 custom-example: load_env
-	slo-generator -f slos/custom-example -b slos/error_budget_policy.yaml -e
+	slo-generator -f slos/custom-example -b slos/error_budget_policy.yaml --export
+
+deploy:
+	gsutil cp 
 
 .PHONY: all run
