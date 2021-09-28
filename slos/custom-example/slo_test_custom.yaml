@@ -8,13 +8,14 @@ metadata:
     slo_name: slo
     metadata:
       env: ${ENV}
-    exporters:
-      class: exporters.CustomExporter
 spec:
   description: 99% of blabla
   backend: backends.CustomBackend
   method: query_sli
   exporters:
   - exporters.CustomExporter
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator: {}
   goal: 0.99

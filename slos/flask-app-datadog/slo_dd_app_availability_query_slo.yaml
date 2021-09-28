@@ -12,7 +12,10 @@ spec:
   description: 99% of Flask app requests return a valid HTTP code
   backend: datadog
   method: query_slo
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
     slo_id: ${DATADOG_SLO_ID}
   goal: 0.99

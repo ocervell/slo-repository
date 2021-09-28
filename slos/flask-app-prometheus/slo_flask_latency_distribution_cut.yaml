@@ -12,8 +12,12 @@ spec:
   description: 99% of Flask app requests return in less than 250ms
   backend: prometheus
   method: distribution_cut
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
-    expression: flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}
-    threshold_bucket: 0.25 # in seconds, corresponds to the `le` (less than) PromQL label
+    expression∂: flask_http_request_duration_seconds_bucket{app="flask-app-tutorial",
+      path='/', status=~"2.."}
+    threshold_bucket: 0.25
   goal: 0.99

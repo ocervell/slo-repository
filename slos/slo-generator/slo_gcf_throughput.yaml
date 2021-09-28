@@ -13,7 +13,10 @@ spec:
   description: 99% of scheduled Cloud Functions are executed
   backend: cloud_monitoring
   method: good_bad_ratio
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
     filter_good: >
       project="${PROJECT_ID}"

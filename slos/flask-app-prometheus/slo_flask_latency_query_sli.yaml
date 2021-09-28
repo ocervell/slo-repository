@@ -12,7 +12,10 @@ spec:
   description: 99% of Flask app requests return in less than 250ms
   backend: prometheus
   method: query_sli
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
     expression: >
       increase(

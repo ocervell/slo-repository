@@ -12,7 +12,10 @@ spec:
   description: 99% of Flask app requests return a valid HTTP code
   backend: datadog
   method: good_bad_ratio
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
     query_good: flask_app_hello_requests.count{http.path:/, http.status_code_class:2xx}
     query_valid: flask_app_hello_requests.count{http.path:/}

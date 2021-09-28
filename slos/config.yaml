@@ -13,7 +13,17 @@ backends:
     url: ${PROMETHEUS_URL}
 
 exporters:
+  bigquery:
+    project_id: ${BIGQUERY_PROJECT_ID}
+    dataset_id: ${BIGQUERY_DATASET_ID}
+    table_id: ${BIGQUERY_TABLE_ID}
+  cloud_monitoring:
+    project_id: ${STACKDRIVER_HOST_PROJECT_ID}
   exporters.CustomExporter: {}
+  pubsub:
+    project_id: ${PROJECT_ID}
+    topic_name: ${PUBSUB_TOPIC_NAME}
+
 error_budget_policies:
   default:
     steps:
@@ -41,25 +51,23 @@ error_budget_policies:
       message_alert: Freeze release, unless related to reliability or security
       message_ok: Unfreeze release, per the agreed roll-out policy
       window: 2419200
-  cloud_service_monitoring:
+  ssm:
     steps:
     - name: 1d
-      window: 86400
       burn_rate_threshold: 6
       alert: true
       message_alert: Page to defend the SLO
       message_ok: Last day on track
-
+      window: 86400
     - name: 7d
-      window: 604800
       burn_rate_threshold: 1.5
       alert: false
       message_alert: Dev team dedicates 25% of engineers to the reliability backlog
       message_ok: Last week on track
-
+      window: 604800
     - name: 28d
-      window: 2419200
       burn_rate_threshold: 1
       alert: false
       message_alert: Freeze release, unless related to reliability or security
       message_ok: Unfreeze release, per the agreed roll-out policy
+      window: 2419200

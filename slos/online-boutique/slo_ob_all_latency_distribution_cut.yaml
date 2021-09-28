@@ -10,10 +10,12 @@ metadata:
       env: ${ENV}
 spec:
   description: 99% of Online-Boutique HTTP requests return in less than 8ms
-  error_budget_policy: cloud_service_monitoring
   backend: cloud_monitoring
   method: distribution_cut
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
     filter_valid: >
       project=${ONLINE_BOUTIQUE_PROJECT_ID}

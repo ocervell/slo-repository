@@ -12,10 +12,12 @@ spec:
   description: 99% of Flask app requests return a good HTTP code
   backend: prometheus
   method: query_sli
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
-    expression: > 
-      sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial", path='/', status=~"2.."}[window])) 
-      / 
-      sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial",path='/'}[window]))
+    expression: ∂> sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial",
+      path='/', status=~"2.."}[window])) / sum(rate(flask_http_request_duration_seconds_bucket{app="flask-app-tutorial",
+      path='/'}[window]))
   goal: 0.99

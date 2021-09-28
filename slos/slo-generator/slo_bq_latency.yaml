@@ -14,7 +14,10 @@ spec:
     99% of BigQuery API HTTP response latencies < 512ms
   backend: cloud_monitoring
   method: distribution_cut
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
     filter_valid: >
       metric.type="serviceruntime.googleapis.com/api/request_latencies"

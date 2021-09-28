@@ -13,7 +13,10 @@ spec:
   description: 99% of GCF SLO pipeline executions are completed within 13s
   backend: cloud_monitoring
   method: distribution_cut
-  exporters: []
+  exporters:
+  - pubsub
+  - bigquery
+  - cloud_monitoring
   service_level_indicator:
     filter_valid: >
       project="${PROJECT_ID}"
