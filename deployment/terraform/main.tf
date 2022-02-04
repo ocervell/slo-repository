@@ -14,115 +14,105 @@
  * limitations under the License.
  */
 
-provider "google" {
-  version = "~> 3.19"
-}
-
-provider "google-beta" {
-  version = "~> 3.19"
-}
-
 locals {
-  # Custom backends / exporters
-  custom_files = [
-    {
-      content = file("../../custom/backends.py")
-      filename = "backends.py"
-    },
-    {
-      content = file("../../custom/exporters.py")
-      filename = "exporters.py"
-    }
+  config        = yamldecode(file("../../slos/config.yaml"))
+  config_export = yamldecode(file("../../slos/config_export.yaml"))
+  slo_configs   = [
+    for cfg in fileset(path.module, "../../slos/**/slo_*.yaml") :
+    yamldecode(file(cfg))
   ]
+}
 
-  # Exporters (common)
-  exporters = yamldecode(templatefile("../../slos/exporters.yaml",
-    {
-      PROJECT_ID                  = var.project_id
-      STACKDRIVER_HOST_PROJECT_ID = var.backends.stackdriver.host_project_id
-      PUBSUB_TOPIC_NAME           = module.slo-pipeline.pubsub_topic_name
-      DATADOG_API_KEY             = var.backends.datadog.api_key
-      DATADOG_APP_KEY             = var.backends.datadog.app_key
-      DYNATRACE_API_TOKEN         = var.backends.dynatrace.api_token
-      DYNATRACE_API_URL           = var.backends.dynatrace.api_url
-      BIGQUERY_PROJECT_ID         = var.backends.bigquery.project_id
-      BIGQUERY_TABLE_ID           = var.backends.bigquery.table_id
-      BIGQUERY_DATASET_ID         = var.backends.bigquery.dataset_id
-      ENV                         = terraform.workspace
-  }))
+# Uncomment for shared scheduler setup
+#resource "google_cloud_scheduler_job" "scheduler" {
+#  project  = var.project_id
+#  region   = var.region
+#  schedule = "* * * * *"
+#  name     = "every-1-minute"
+#  http_target {
+#    oidc_token {
+#      service_account_email = module.slo-generator.service_account_email
+#      audience              = module.slo-generator.service_url
+#    }
+#    http_method = "POST"
+#    uri         = "${module.slo-generator.service_url}/?batch=true"
+#    body        = base64encode(join(";", [for config in local.slo_configs : "gs://${module.slo-generator.bucket_name}/slos/${config.metadata.name}.yaml"]))
+#  }
+#}
 
-  # Error budget policy (common)
-  error_budget_policy     = yamldecode(file("../../slos/error_budget_policy.yaml"))
-  error_budget_policy_ssm = yamldecode(file("../../slos/error_budget_policy_ssm.yaml"))
-
-  # SLO configs
-  files = fileset(path.module, "../../slos/**/slo_*.yaml")
-  slo_configs = [
-    for file in local.files :
-    merge(yamldecode(templatefile(file,
-      {
-        PROJECT_ID                   = var.project_id
-        STACKDRIVER_HOST_PROJECT_ID  = var.backends.stackdriver.host_project_id
-        PROMETHEUS_URL               = var.backends.prometheus.url
-        DATADOG_API_KEY              = var.backends.datadog.api_key
-        DATADOG_APP_KEY              = var.backends.datadog.app_key
-        DATADOG_SLO_ID               = var.backends.datadog.slo_id
-        DYNATRACE_API_TOKEN          = var.backends.dynatrace.api_token
-        DYNATRACE_API_URL            = var.backends.dynatrace.api_url
-        ONLINE_BOUTIQUE_PROJECT_ID   = var.apps.online_boutique.project_id
-        ONLINE_BOUTIQUE_LOCATION     = var.apps.online_boutique.location
-        ONLINE_BOUTIQUE_CLUSTER_NAME = var.apps.online_boutique.cluster_name
-        ONLINE_BOUTIQUE_NAMESPACE    = var.apps.online_boutique.namespace
-        ENV                          = terraform.workspace
-      })), {
-      exporters = local.exporters.slo
-    })
-  ]
-  slo_configs_map = {
-    for config in local.slo_configs :
-    "${config.service_name}-${config.feature_name}-${config.slo_name}" => config
+module "slo-generator" {
+  source                = "git::https://github.com/terraform-google-modules/terraform-google-slo//modules/slo-generator?ref=slo-generator-v2"
+  project_id            = var.project_id
+  region                = var.region
+  slo_generator_version = var.slo_generator_version
+  config                = local.config
+  slo_configs           = local.slo_configs
+  # create_cloud_schedulers = false # uncommented for shared scheduler setup
+  annotations           = {
+    "autoscaling.knative.dev/minScale" = "1"
+    "autoscaling.knative.dev/maxScale" = "10"
+  }
+  concurrency           = 1000
+  env                   = {
+    ENV                          = terraform.workspace
+    PROJECT_ID                   = var.project_id
+    DYNATRACE_API_URL            = var.backends.dynatrace.api_url
+    ONLINE_BOUTIQUE_PROJECT_ID   = var.apps.online_boutique.project_id
+    ONLINE_BOUTIQUE_LOCATION     = var.apps.online_boutique.location
+    ONLINE_BOUTIQUE_CLUSTER_NAME = var.apps.online_boutique.cluster_name
+    ONLINE_BOUTIQUE_NAMESPACE    = var.apps.online_boutique.namespace
+    STACKDRIVER_HOST_PROJECT_ID  = var.backends.stackdriver.host_project_id
+    PROMETHEUS_URL               = var.backends.prometheus.url
+    SERVICE_URL                  = module.slo-pipeline.service_url
+    DATADOG_SLO_ID               = var.backends.datadog.slo_id
+  }
+  secrets               = {
+    DATADOG_API_KEY              = var.backends.datadog.api_key
+    DATADOG_APP_KEY              = var.backends.datadog.app_key
+    DYNATRACE_API_TOKEN          = var.backends.dynatrace.api_token
   }
 }
 
-resource "google_service_account" "slo" {
-  project    = var.project_id
-  account_id = var.service_account_name
+resource "google_project_iam_member" "metric-viewer" {
+  project = var.backends.stackdriver.host_project_id
+  role    = "roles/monitoring.viewer"
+  member  = "serviceAccount:${module.slo-generator.service_account_email}"
 }
 
-resource "google_storage_bucket" "slos" {
-  project                     = var.project_id
-  location                    = "EU"
-  name                        = var.bucket_name
-  force_destroy               = true
-  uniform_bucket_level_access = true
+resource "google_project_iam_member" "slo-creator" {
+  project = var.apps.online_boutique.project_id
+  role    = "roles/monitoring.servicesEditor"
+  member  = "serviceAccount:${module.slo-generator.service_account_email}"
 }
 
 module "slo-pipeline" {
-  source                = "terraform-google-modules/slo/google//modules/slo-pipeline"
-  version               = "1.0.0"
+  source                = "git::https://github.com/terraform-google-modules/terraform-google-slo//modules/slo-generator?ref=slo-generator-v2"
+  service_name          = "slo-generator-export"
   project_id            = var.project_id
   region                = var.region
-  pubsub_topic_name     = var.pubsub_topic_name
-  exporters             = local.exporters.pipeline
   slo_generator_version = var.slo_generator_version
-  dataset_create        = false
-  function_timeout      = "90"
+  config                = local.config_export
+  target                = "run_export"
+  signature_type        = "cloudevent"
+  env                   = {
+    BIGQUERY_PROJECT_ID         = var.backends.bigquery.project_id
+    BIGQUERY_DATASET_ID         = var.backends.bigquery.dataset_id
+    BIGQUERY_TABLE_ID           = var.backends.bigquery.table_id
+    STACKDRIVER_HOST_PROJECT_ID = var.backends.stackdriver.host_project_id
+  }
+  authorized_members = [
+    "serviceAccount:${module.slo-generator.service_account_email}"
+  ]
 }
 
-module "slos" {
-  source                     = "terraform-google-modules/slo/google//modules/slo"
-  version                    = "1.0.0"
-  for_each                   = local.slo_configs_map
-  schedule                   = var.schedule
-  region                     = var.region
-  project_id                 = var.project_id
-  labels                     = var.labels
-  config                     = each.value
-  error_budget_policy        = each.value.backend.class == "StackdriverServiceMonitoring" ? local.error_budget_policy_ssm : local.error_budget_policy
-  service_account_email      = google_service_account.slo.email
-  use_custom_service_account = true
-  slo_generator_version      = var.slo_generator_version
-  config_bucket              = google_storage_bucket.slos.name
-  extra_files                = each.value.backend.class == "backends.CustomBackend" ? local.custom_files : []
-  function_memory            = 256
+resource "google_project_iam_member" "metric-writer" {
+  project = var.backends.stackdriver.host_project_id
+  role    = "roles/monitoring.metricWriter"
+  member  = "serviceAccount:${module.slo-pipeline.service_account_email}"
+}
+
+resource "google_project_iam_member" "bq-data-editor" {
+  project = var.backends.stackdriver.host_project_id
+  role    = "roles/bigquery.dataEditor"
+  member  = "serviceAccount:${module.slo-pipeline.service_account_email}"
 }

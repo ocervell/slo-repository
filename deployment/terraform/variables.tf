@@ -55,8 +55,3 @@ variable "labels" {
   description = "Project labels"
   default     = {}
 }
-
-variable "service_account_name" {
-  description = "Service account email"
-  type        = string
-}
