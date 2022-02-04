@@ -1,29 +1,17 @@
-# Copyright 2020 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-service_name: ob
-feature_name: all
-slo_description: 99% of Online-Boutique HTTP requests return with a valid HTTP code
-slo_name: availability
-slo_target: 0.99
+apiVersion: sre.google.com/v2
+kind: ServiceLevelObjective
 metadata:
-  env: ${ENV}
-backend:
-  class: Stackdriver
-  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+  name: ob-all-availability
+  labels:
+    service_name: ob
+    feature_name: all
+    slo_name: availability
+    env: ${ENV}
+spec:
+  description: 99% of Online-Boutique HTTP requests return with a valid HTTP code
+  backend: cloud_monitoring
   method: good_bad_ratio
-  measurement:
+  service_level_indicator:
     filter_good: >
       project=${ONLINE_BOUTIQUE_PROJECT_ID}
       resource.label.cluster_name="demo"
@@ -35,3 +23,4 @@ backend:
       resource.label.cluster_name="demo"
       metric.type="istio.io/service/server/request_count"
       resource.type="k8s_container"
+  goal: 0.99

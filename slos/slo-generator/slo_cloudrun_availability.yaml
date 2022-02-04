@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,24 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-service_name: generator
-feature_name: pubsub
-slo_description: 99% of PubSub messages are acknowledged
-slo_name: coverage
-slo_target: 0.99
+apiVersion: sre.google.com/v2
+kind: ServiceLevelObjective
 metadata:
-  env: ${ENV}
-  component: all
-backend:
-  class: Stackdriver
-  project_id: ${STACKDRIVER_HOST_PROJECT_ID}
+  name: slo-generator-errors
+  labels:
+    service_name: slo-generator
+    feature_name: cloudrun
+    slo_name: errors
+    team: sre
+    env: ${ENV}
+spec:
+  goal: 0.99
+  description: 99% of requests to Cloud Run service have a good HTTP status code
+  backend: cloud_monitoring
   method: good_bad_ratio
-  measurement:
+  service_level_indicator:
     filter_good: >
       project="${PROJECT_ID}"
-      metric.type="pubsub.googleapis.com/subscription/ack_message_count"
-      resource.type="pubsub_subscription"
-    filter_bad: >
+      metric.type="run.googleapis.com/request_count"
+      metric.label."response_code_class"="2xx"
+    filter_valid: >
       project="${PROJECT_ID}"
-      metric.type="pubsub.googleapis.com/subscription/num_undelivered_messages"
-      resource.type="pubsub_subscription"
+      metric.type="run.googleapis.com/request_count"
